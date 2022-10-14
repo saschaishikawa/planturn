@@ -63,8 +63,8 @@ void setup() {
   stepper.setCurrentPosition(0); // Set the current position to 0 steps
 
   // Set up timers
-  timer.every(stepperInterval, moveStepperMotor);
-//  timer.every(displayInterval, updateDisplay);
+//  timer.every(stepperInterval, moveStepperMotor);
+  timer.every(displayInterval, updateDisplay);
 }
 
 bool moveStepperMotor(void *) {
@@ -113,7 +113,8 @@ void handleEncoderUpdates() {
   
   encoderPosition = map(encoderPosCount, 1, 30, 1, stepsPerRevolution);
 
-  Serial.print("Encoder Position: " + encoderPosition);
+  Serial.print("Encoder Position: ");
+  Serial.println(encoderPosition);
   stepper.moveTo(encoderPosition);
  
   pinALast = aVal;

@@ -4,8 +4,8 @@
  * Sascha T. Ishikawa
  * October 14, 2022
  * 
- * Rotation glitches whenever a timed event, i.e., updating the display, occurs on the same timestep
- * May need to use interrupts or get clever with timing
+ * Rotation stuttered whenever a timed event, i.e., updating the display, occurs on the same timestep
+ * Solved by displaying static "ROTATING..." screen while rotating, blocking any re-renders
  */
 
 #include <AccelStepper.h>
@@ -15,7 +15,7 @@
 
 // Stepper motor pins
 #define stepPin 2
-#define dirPin 5
+#define dirPin 3
 #define stepsPerRevolution 6400
 
 // OLED pins
@@ -24,18 +24,20 @@
 // Instantiate OLED display
 Adafruit_SSD1306 display(OLED_RESET);
 
-int pinA = 40; // Connected to CLK on KY-040
-int pinB = 41; // Connected to DT on KY-040
+int pinA = 18; // Connected to CLK on KY-040
+int pinB = 19; // Connected to DT on KY-040
 int encoderPosCount = 0;
 int pinALast;
 int aVal;
-boolean bCW;
+bool bCW;
 
 long stepperInterval = 10000; //450000; // 7.5 minutes
 long displayInterval = 1000;  // 1 second
-long currentTick = stepperInterval / 1000;
+long currentTick = stepperInterval/1000;
 
 int encoderPosition = 0;
+
+bool isRotationActive = false;
 
 // Define the stepper motor and the pins that is connected to
 AccelStepper stepper(1, stepPin, dirPin); // (Typeof driver: with 2 pins, STEP, DIR)
@@ -63,58 +65,82 @@ void setup() {
   stepper.setCurrentPosition(0); // Set the current position to 0 steps
 
   // Set up timers
-//  timer.every(stepperInterval, moveStepperMotor);
+  timer.every(stepperInterval, moveStepperMotor);
   timer.every(displayInterval, updateDisplay);
 }
 
+void displayRotationScreen() {
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(32, 16);
+  display.clearDisplay();
+  display.println("ROTATING...");
+  display.display();
+  return; 
+}
+
 bool moveStepperMotor(void *) {
-//  return true;
-  Serial.println("Tick.");
+  if (!isRotationActive) {
+    displayRotationScreen();
+    isRotationActive = true; // Block re-renders until rotation concluded
+  }
+  
   stepper.move(map(degPerMove, 1, 360, 1, stepsPerRevolution));
   return true;
 }
 
 bool updateDisplay(void *) {
-  if (currentTick == 1) {
+
+  // Only display when not moving
+  if (abs(stepper.distanceToGo()) > 0) {
+    // DEBUG CODE
+    Serial.print("DISTANCE TO GO: ");
+    Serial.println(stepper.distanceToGo());
+  } else {
+    // Reset active rotation flag
+    isRotationActive = false;
+
+    // Update OLED buffer
+    display.setTextSize(3);
+    display.setTextColor(WHITE);
+    display.setCursor(56, 10);
+    display.clearDisplay();
+    display.println(currentTick);
+    display.display(); 
+  } 
+
+  // Reset countdown timer
+  if (currentTick <= 0) {
+    Serial.println("*** STEP ***");
     currentTick = stepperInterval/1000;
   }
 
-  display.setTextSize(3);
-  display.setTextColor(WHITE);
-  display.setCursor(56, 10);
-  display.clearDisplay();
-  display.println(currentTick);
-  display.display();
-  
+  Serial.print("CURRENT TICK: ");
   Serial.println(currentTick);
+
   currentTick--;
+  
   return true;
 }
 
 void handleEncoderUpdates() {
+
+  if (!isRotationActive) {
+    displayRotationScreen();
+    isRotationActive = true; // Block re-renders until rotation concluded
+  }
   
-  // if the knob is rotating, we need to determine direction
-  // We do that by reading pin B.
-  if (digitalRead(pinB) != aVal) { // Means pin A Changed first - We're Rotating Clockwise
+  if (digitalRead(pinB) != aVal) {
+    // Pin A changed cirst, so rotating CW
     encoderPosCount ++;
     bCW = true;
-  } else {// Otherwise B changed first and we're moving CCW
+  } else {
+    // Pin B changed first, so rotating CCW
     bCW = false;
     encoderPosCount--;
   }
-  
-  Serial.print ("Rotated: ");
-  
-  if (bCW){
-    Serial.println ("clockwise");
-  } else {
-    Serial.println("counterclockwise");
-  }
-  
+ 
   encoderPosition = map(encoderPosCount, 1, 30, 1, stepsPerRevolution);
-
-  Serial.print("Encoder Position: ");
-  Serial.println(encoderPosition);
   stepper.moveTo(encoderPosition);
  
   pinALast = aVal;
@@ -129,10 +155,9 @@ void loop() {
     handleEncoderUpdates();
   }
 
-  // Keep the timer running
+  // Advance timer
   timer.tick();
 
   // Keep running motor, if needed
   stepper.run();
-
 } 

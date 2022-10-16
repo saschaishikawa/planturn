@@ -94,7 +94,18 @@ bool moveStepperMotor(void *) {
 
 bool updateDisplay(void *) {
 
-  // Only display when not moving
+  // Reset countdown timer
+  if (currentTick <= 0) {
+    Serial.println("*** STEP ***");
+    currentTick = stepperInterval/1000;
+  }
+
+  Serial.print("CURRENT TICK: ");
+  Serial.println(currentTick);
+
+  currentTick--;
+
+    // Only display when not moving
   if (abs(stepper.distanceToGo()) > 0) {
     // DEBUG CODE
     Serial.print("DISTANCE TO GO: ");
@@ -118,17 +129,6 @@ bool updateDisplay(void *) {
     display.println("s");
     display.display(); 
   } 
-
-  // Reset countdown timer
-  if (currentTick <= 0) {
-    Serial.println("*** STEP ***");
-    currentTick = stepperInterval/1000;
-  }
-
-  Serial.print("CURRENT TICK: ");
-  Serial.println(currentTick);
-
-  currentTick--;
   
   return true;
 }

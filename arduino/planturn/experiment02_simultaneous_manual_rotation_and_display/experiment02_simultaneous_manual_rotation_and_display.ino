@@ -16,6 +16,7 @@
 // Stepper motor pins
 #define stepPin 2
 #define dirPin 3
+#define disablePin 4
 #define stepsPerRevolution 6400
 
 // OLED pins
@@ -31,7 +32,7 @@ int pinALast;
 int aVal;
 bool bCW;
 
-long stepperInterval = 10000; //450000; // 7.5 minutes
+long stepperInterval = 450000; // 7.5 minutes
 long displayInterval = 1000;  // 1 second
 long currentTick = stepperInterval/1000;
 
@@ -54,15 +55,17 @@ void setup() {
   display.clearDisplay();
   
   // Set up rotary encoder
-  pinMode (pinA,INPUT);
-  pinMode (pinB,INPUT);
+  pinMode(pinA,INPUT);
+  pinMode(pinB,INPUT);
   pinALast = digitalRead(pinA);
   Serial.begin (9600);
 
   // Set up stepper motor
-  stepper.setMaxSpeed(5000); // Set maximum speed value for the stepper
-  stepper.setAcceleration(5000); // Set acceleration value for the stepper
-  stepper.setCurrentPosition(0); // Set the current position to 0 steps
+  pinMode(disablePin, OUTPUT);
+  digitalWrite(disablePin, HIGH);  // Disable stepper motor until needed
+  stepper.setMaxSpeed(5000);       // Set maximum speed value for the stepper
+  stepper.setAcceleration(5000);   // Set acceleration value for the stepper
+  stepper.setCurrentPosition(0);   // Set the current position to 0 steps
 
   // Set up timers
   timer.every(stepperInterval, moveStepperMotor);
@@ -72,7 +75,7 @@ void setup() {
 void displayRotationScreen() {
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.setCursor(32, 16);
+  display.setCursor(32, 12);
   display.clearDisplay();
   display.println("ROTATING...");
   display.display();
@@ -101,11 +104,18 @@ bool updateDisplay(void *) {
     isRotationActive = false;
 
     // Update OLED buffer
+
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(16, 0);
+    display.println("NEXT ROTATION IN");
+
     display.setTextSize(3);
     display.setTextColor(WHITE);
-    display.setCursor(56, 10);
-    display.clearDisplay();
-    display.println(currentTick);
+    display.setCursor(32, 10);
+    display.print(currentTick);
+    display.println("s");
     display.display(); 
   } 
 
@@ -148,6 +158,9 @@ void handleEncoderUpdates() {
 }
  
 void loop() {
+
+  // Disable stepper motor between rotations
+  digitalWrite(disablePin, !isRotationActive);
   
   // Check for manual override
   aVal = digitalRead(pinA);

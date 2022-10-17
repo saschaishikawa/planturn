@@ -25,6 +25,10 @@ long displayInterval = 1000;             // 1 second
 long moisturePollInterval = 1000;//60000;       // 1 minute
 long currentTick = stepperInterval/1000;
 
+int currentMenuIndex = 0;
+
+int moisturePercent = 0;
+
 bool isRotationActive = false;
 
 // For timed intervals
@@ -56,6 +60,9 @@ void loop() {
   // Keep running motor, if needed
   runStepperMotor();
 
+  // Has button been pressed?
+  checkButtonPress();
+  
   // Advance timer
   timer.tick();
 } 

@@ -45,20 +45,85 @@ bool updateDisplay(void *) {
     isRotationActive = false;
 
     // Update OLED buffer
+    displayActiveMenu();
 
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.setCursor(16, 0);
-    display.println("NEXT ROTATION IN");
-
-    display.setTextSize(3);
-    display.setTextColor(WHITE);
-    display.setCursor(32, 10);
-    display.print(currentTick);
-    display.println("s");
-    display.display(); 
   } 
   
   return true;
+}
+
+
+void displayActiveMenu() {
+    switch (currentMenuIndex) {
+      case(0): // Menu 1
+        displayMainMenu();
+        break;
+      case(1): // Menu 2
+        displayRotationCountdown();
+        break;
+      default:
+        displayDefaultMenu();
+    }
+
+
+}
+
+void displayMainMenu() {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(18,0);
+  display.println("PLANTURN v1.0a");
+  
+  display.setCursor(0,16);
+  display.println("DEG: N/A");
+  display.setCursor(30,16);
+  
+  display.setCursor(64,16);
+  display.println("RPD: 1.0");
+
+  display.setCursor(64,8);
+  display.println("LUX: N/A");
+
+  display.setCursor(64,24);
+  display.println("WGT: N/A");
+
+  display.setCursor(0,24);
+  display.println("H2O:");
+
+  display.setCursor(30,24);
+  
+  if(moisturePercent > 100) {
+    display.println("100 %");
+  } else if(moisturePercent <0) {
+    display.println("0 %");
+  } else if(moisturePercent >= 0 && moisturePercent < 100) {
+    display.println(String(moisturePercent) + " %");
+  }  
+
+  display.display();
+}
+
+
+void displayRotationCountdown() {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(16, 0);
+  display.println("NEXT ROTATION IN");
+  display.setTextSize(3);
+  display.setTextColor(WHITE);
+  display.setCursor(32, 10);
+  display.print(currentTick);
+  display.println("s");    
+  display.display(); 
+}
+
+void displayDefaultMenu() {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(16, 0);
+  display.println("???");
+  display.display(); 
 }

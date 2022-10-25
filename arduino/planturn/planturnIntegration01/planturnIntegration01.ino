@@ -1,13 +1,14 @@
 /*
  * Planturn Integration
  * Sascha T. Ishikawa
- * October 16, 2022
+ * October 24, 2022
  * 
  * Features:
  * - Manual Rotation
  * - Periodic Rotation 
  * - Display
  * - Moisture Sensor 
+ * - RGB lighting
  */
 
 #include <arduino-timer.h>
@@ -19,6 +20,9 @@
 #define stepsPerRevolution 6400
 
 // GLOBAL VARIABLES
+
+// Set application-wide verbosity
+const bool VERBOSE = false;
 
 long stepperInterval = 450000;           // 7.5 minutes
 long displayInterval = 1000;             // 1 second
@@ -39,30 +43,36 @@ void setup() {
   // Open serial port, set the baud rate to 9600 bps
   Serial.begin(9600); 
 
-  // Set up components
-  setupDisplay();
-  setupRotaryEncoder();
-  setupStepperMotor();
+  // Set up RGB lighting
+  setupRGB();
 
-  // Set up timers
-  timer.every(stepperInterval, moveStepperMotor);
-  timer.every(displayInterval, updateDisplay);
-  timer.every(moisturePollInterval, pollMoistureSensor);
+//  // Set up components
+//  setupDisplay();
+//  setupRotaryEncoder();
+//  setupStepperMotor();
+//
+//  // Set up timers
+//  timer.every(stepperInterval, moveStepperMotor);
+//  timer.every(displayInterval, updateDisplay);
+//  timer.every(moisturePollInterval, pollMoistureSensor);
 }
  
 void loop() {
-  // Disable stepper motor between rotations
-  digitalWrite(disablePin, !isRotationActive);
-  
-  // Respond to changes in rotary encoders
-  handleRotaryEncoderUpdates();
+//  // Disable stepper motor between rotations
+//  digitalWrite(disablePin, !isRotationActive);
 
-  // Keep running motor, if needed
-  runStepperMotor();
-
-  // Has button been pressed?
-  checkButtonPress();
+  // Handle RGB light changes
+  updateRGB();
   
-  // Advance timer
-  timer.tick();
+//  // Respond to changes in rotary encoders
+//  handleRotaryEncoderUpdates();
+//
+//  // Keep running motor, if needed
+//  runStepperMotor();
+//
+//  // Has button been pressed?
+//  checkButtonPress();
+  
+//  // Advance timer
+//  timer.tick();
 } 

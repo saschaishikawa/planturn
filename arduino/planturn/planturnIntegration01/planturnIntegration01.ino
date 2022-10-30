@@ -4,10 +4,11 @@
  * October 24, 2022
  * 
  * Features:
- * - Manual Rotation
- * - Periodic Rotation 
+ * - Manual rotation
+ * - Periodic rotation 
  * - Display
- * - Moisture Sensor 
+ * - Moisture sensor 
+ * - Light sensor
  * - RGB lighting
  */
 
@@ -30,6 +31,9 @@ long stepperInterval = 450000;           // 7.5 minutes
 long displayInterval = 1000;             // 1 second
 long moisturePollInterval = 1000;        // 1 second
 long currentTick = stepperInterval/1000;
+long lightPollInterval = 1000;           // 1 second
+int lux;                                 // Light measurement
+int luxThreshold = 200;                  // Rotor disabled if under
 
 int currentMenuIndex = 1;
 
@@ -55,6 +59,7 @@ void setup() {
   timer.every(stepperInterval, moveStepperMotor);
   timer.every(displayInterval, updateDisplay);
   timer.every(moisturePollInterval, pollMoistureSensor);
+  timer.every(lightPollInterval, pollLightSensor);
 }
  
 void loop() {

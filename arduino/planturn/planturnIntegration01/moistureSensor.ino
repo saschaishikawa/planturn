@@ -3,7 +3,7 @@ const int WaterValue = 226;  // value for wet sensor
 int moistureReading = 0;
 
 bool pollMoistureSensor(void *) { 
-  moistureReading = analogRead(A0);
+  moistureReading = analogRead(A1);
   moisturePercent = map(moistureReading, AirValue, WaterValue, 0, 100);
 
 //  if(moisturePercent > 100) {

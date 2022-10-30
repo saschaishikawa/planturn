@@ -36,6 +36,18 @@ void setupRGB() {
 }
 
 void updateRGB() {
+
+  if (lux < luxThreshold) {
+    ledR.blink();
+    ledG.off();
+    ledB.off();
+    
+  } else {
+    ledR.off();
+    ledG.blink();
+    ledB.off();
+  }
+  
   ledR.update();
   ledG.update();
   ledB.update();

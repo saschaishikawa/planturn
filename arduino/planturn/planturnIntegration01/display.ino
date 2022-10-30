@@ -96,7 +96,8 @@ void displayMainMenu() {
 
   // Brightness
   display.setCursor(64,8);
-  display.println("LUX: N/A");
+  display.print("LUX: ");
+  display.println(String(lux));
 
   // Weight
   display.setCursor(64,24);

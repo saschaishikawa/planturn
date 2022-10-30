@@ -80,7 +80,11 @@ void displayMainMenu() {
   // Countdown
   display.setCursor(0,8);
   display.print("TIM: ");
-  display.println(String(currentTick) + "s");
+  if (lux < luxThreshold) {
+    display.println("OFF");
+  } else {
+    display.println(String(currentTick) + "s");  
+  }
   display.setCursor(30,8);
 
   // Current Position (Deg)
@@ -122,15 +126,26 @@ void displayMainMenu() {
 
 void displayRotationCountdown() {
   display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(16, 0);
-  display.println("NEXT ROTATION IN");
-  display.setTextSize(3);
-  display.setTextColor(WHITE);
-  display.setCursor(32, 10);
-  display.print(currentTick);
-  display.println("s");    
+
+  if (lux < luxThreshold) {
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(16, 0);
+    display.println("ROTATION DISABLED");
+    display.setCursor(16, 10);
+    display.println("NOT ENOUGH LIGHT");
+  } else {
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(16, 0);
+    display.println("NEXT ROTATION IN");
+    display.setTextSize(3);
+    display.setTextColor(WHITE);
+    display.setCursor(32, 10);
+    display.print(currentTick);
+    display.println("s");  
+  }
+  
   display.display(); 
 }
 

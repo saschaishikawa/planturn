@@ -21,6 +21,10 @@ void setupStepperMotor() {
 }
 
 bool moveStepperMotor(void *) {
+  if (lux < luxThreshold) {
+    return;
+  }
+  
   if (!isRotationActive) {
     displayRotationScreen();
     isRotationActive = true; // Block re-renders until rotation concluded

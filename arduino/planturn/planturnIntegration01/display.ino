@@ -8,8 +8,17 @@
 Adafruit_SSD1306 display(OLED_RESET);
 
 void setupDisplay() {
+  
+  if (VERBOSE) {
+    Serial.print("Setting up display...");
+  }
+  
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C); //initialize with the I2C addr 0x3C (128x64)
   display.clearDisplay();
+
+  if (VERBOSE) {
+    Serial.println("Done.");
+  }
 }
 
 void displayRotationScreen() {
@@ -30,28 +39,23 @@ bool updateDisplay(void *) {
     currentTick = stepperInterval/1000;
   }
 
-//  Serial.print("CURRENT TICK: ");
-//  Serial.println(currentTick);
-
   currentTick--;
 
-    // Only display when not moving
+  // Only display when not moving
   if (abs(stepperMotorDistanceToGo()) > 0) {
-    // DEBUG CODE
-    Serial.print("DISTANCE TO GO: ");
-    Serial.println(stepperMotorDistanceToGo());
+    //// DEBUG CODE
+    //Serial.print("DISTANCE TO GO: ");
+    //Serial.println(stepperMotorDistanceToGo());
   } else {
     // Reset active rotation flag
     isRotationActive = false;
 
     // Update OLED buffer
     displayActiveMenu();
-
   } 
   
   return true;
 }
-
 
 void displayActiveMenu() {
     switch (currentMenuIndex) {
@@ -64,8 +68,6 @@ void displayActiveMenu() {
       default:
         displayDefaultMenu();
     }
-
-
 }
 
 void displayMainMenu() {
@@ -73,21 +75,34 @@ void displayMainMenu() {
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(18,0);
-  display.println("PLANTURN v1.0a");
-  
-  display.setCursor(0,16);
-  display.println("DEG: N/A");
-  display.setCursor(30,16);
-  
-  display.setCursor(64,16);
-  display.println("RPD: 1.0");
+  display.println("PLANTURN v1.0");
 
+  // Countdown
+  display.setCursor(0,8);
+  display.print("TIM: ");
+  display.println(String(currentTick) + "s");
+  display.setCursor(30,8);
+
+  // Current Position (Deg)
+  display.setCursor(0,16);
+  display.print("DEG: ");
+  display.println(String(degPerMove));
+  display.setCursor(30,16);
+
+  // Revolutions Per Day
+  display.setCursor(64,16);
+  display.print("RPD: ");
+  display.println(String(revPerDay));
+
+  // Brightness
   display.setCursor(64,8);
   display.println("LUX: N/A");
 
+  // Weight
   display.setCursor(64,24);
   display.println("WGT: N/A");
 
+  // Moisture
   display.setCursor(0,24);
   display.println("H2O:");
 
@@ -98,12 +113,11 @@ void displayMainMenu() {
   } else if(moisturePercent <0) {
     display.println("0 %");
   } else if(moisturePercent >= 0 && moisturePercent < 100) {
-    display.println(String(moisturePercent) + " %");
+    display.println(String(moisturePercent) + "%");
   }  
 
   display.display();
 }
-
 
 void displayRotationCountdown() {
   display.clearDisplay();

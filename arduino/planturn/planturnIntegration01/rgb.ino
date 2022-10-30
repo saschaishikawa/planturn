@@ -1,8 +1,8 @@
 #include <Fadinglight.h>
 
-#define R_PIN 3
-#define G_PIN 5
-#define B_PIN 6
+#define R_PIN 9
+#define G_PIN 10
+#define B_PIN 11
 #define RGB_INTERVAL 10
 #define LOGARITHMIC true
 
@@ -39,8 +39,4 @@ void updateRGB() {
   ledR.update();
   ledG.update();
   ledB.update();
-
-  if (VERBOSE) {
-    Serial.println("Updated RGB.");
-  }
 }

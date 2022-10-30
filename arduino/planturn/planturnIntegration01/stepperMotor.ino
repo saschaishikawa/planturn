@@ -3,14 +3,21 @@
 // Define the stepper motor and the pins that is connected to
 AccelStepper stepper(1, stepPin, dirPin); // (Typeof driver: with 2 pins, STEP, DIR)
 
-int degPerMove = 15;
-
 void setupStepperMotor() {
+  
+  if (VERBOSE) {
+    Serial.print("Setting up rotor...");
+  }
+  
   pinMode(disablePin, OUTPUT);
   digitalWrite(disablePin, HIGH);  // Disable stepper motor until needed
   stepper.setMaxSpeed(5000);       // Set maximum speed value for the stepper
   stepper.setAcceleration(5000);   // Set acceleration value for the stepper
   stepper.setCurrentPosition(0);   // Set the current position to 0 steps
+
+  if (VERBOSE) {
+    Serial.println("Done.");
+  }
 }
 
 bool moveStepperMotor(void *) {

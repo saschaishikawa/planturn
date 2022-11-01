@@ -20,17 +20,22 @@ void setupStepperMotor() {
   }
 }
 
+/*
+ * Timed rotation
+ */
 bool moveStepperMotor(void *) {
-  if (lux < luxThreshold) {
-    return;
-  }
-  
+
+  // Block re-renders until rotation concluded
   if (!isRotationActive) {
     displayRotationScreen();
-    isRotationActive = true; // Block re-renders until rotation concluded
+    isRotationActive = true;
+  }
+
+  // Only move if there is enough ambient light
+  if (lux >= luxThreshold) {
+    stepper.move(map(degPerMove, 1, 360, 1, stepsPerRevolution));
   }
   
-  stepper.move(map(degPerMove, 1, 360, 1, stepsPerRevolution));
   return true;
 }
 

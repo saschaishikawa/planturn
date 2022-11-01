@@ -10,11 +10,19 @@ Fadinglight ledR(R_PIN, LOGARITHMIC, RGB_INTERVAL);
 Fadinglight ledG(G_PIN, LOGARITHMIC, RGB_INTERVAL);
 Fadinglight ledB(B_PIN, LOGARITHMIC, RGB_INTERVAL);
 
-SpeedSetting rgbSettings = {
+SpeedSetting RGB_SLOW = {
   .on_ms = 800,
   .off_ms = 800,
   .pause_ms = 1600,
   .ending_ms = 3200,
+};
+
+
+SpeedSetting RGB_FAST = {
+  .on_ms = 400,
+  .off_ms = 400,
+  .pause_ms = 800,
+  .ending_ms = 1600,
 };
 
 void setupRGB() {
@@ -22,13 +30,9 @@ void setupRGB() {
     Serial.print("Setting up RGB...");  
   }
   
-  ledR.setSpeed(rgbSettings);
-  ledG.setSpeed(rgbSettings);
-  ledB.setSpeed(rgbSettings);
-
-  ledR.off();
-  ledG.blink();
-  ledB.off();
+  ledR.setSpeed(RGB_SLOW);
+  ledG.setSpeed(RGB_SLOW);
+  ledB.setSpeed(RGB_SLOW);
 
   if (VERBOSE) {
     Serial.println("Done.");
@@ -37,17 +41,57 @@ void setupRGB() {
 
 void updateRGB() {
 
-  if (lux < luxThreshold) {
-    ledR.blink();
-    ledG.off();
-    ledB.off();
-    
-  } else {
-    ledR.off();
-    ledG.blink();
-    ledB.off();
+  // NOTE: Moisture takes precedence over light
+  if (moisturePercent < moistureThreshold) { 
+    blinkBlue();
+    return;
+  } else if (lux < luxThreshold) { // Not enough light
+    blinkRed();
+    return;
+  } else { // All systems go
+    blinkGreen();
+    return;
   }
   
+}
+
+void blinkRed() {
+  ledR.blink();
+  ledG.off();
+  ledB.off();
+
+  ledR.setSpeed(RGB_SLOW);
+  ledG.setSpeed(RGB_SLOW);
+  ledB.setSpeed(RGB_SLOW);
+
+  ledR.update();
+  ledG.update();
+  ledB.update();
+}
+
+void blinkGreen() {
+  ledR.off();
+  ledG.blink();
+  ledB.off();
+
+  ledR.setSpeed(RGB_SLOW);
+  ledG.setSpeed(RGB_SLOW);
+  ledB.setSpeed(RGB_SLOW);
+
+  ledR.update();
+  ledG.update();
+  ledB.update();
+}
+
+void blinkBlue() {
+  ledR.off();
+  ledG.off();
+  ledB.blink();
+
+  ledR.setSpeed(RGB_SLOW);
+  ledG.setSpeed(RGB_SLOW);
+  ledB.setSpeed(RGB_SLOW);
+
   ledR.update();
   ledG.update();
   ledB.update();

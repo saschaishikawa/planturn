@@ -33,11 +33,12 @@ long moisturePollInterval = 1000;        // 1 second
 long currentTick = stepperInterval/1000;
 long lightPollInterval = 1000;           // 1 second
 int lux;                                 // Light measurement
-int luxThreshold = 200;                  // Rotor disabled if under
+int luxThreshold = 150;                  // Rotor disabled if under
 
 int currentMenuIndex = 1;
 
 int moisturePercent = 0;
+int moistureThreshold = 25;              // Percent moisture under which blue light flashes
 
 bool isRotationActive = false;
 

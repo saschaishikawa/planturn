@@ -1,8 +1,8 @@
 #include <Fadinglight.h>
 
 #define R_PIN 9
-#define G_PIN 10
-#define B_PIN 11
+#define G_PIN 11
+#define B_PIN 10
 #define RGB_INTERVAL 10
 #define LOGARITHMIC true
 
@@ -43,10 +43,12 @@ void updateRGB() {
 
   // NOTE: Moisture takes precedence over light
   if (moisturePercent < moistureThreshold) { 
+    Serial.println("NOT ENOUGH WATER");
     blinkBlue();
     return;
   } else if (lux < luxThreshold) { // Not enough light
     blinkRed();
+    Serial.println("NOT ENOUGH LIGHT");
     return;
   } else { // All systems go
     blinkGreen();

@@ -14,33 +14,38 @@
 
 #include <arduino-timer.h>
 
-// Stepper motor pins
-#define disablePin 5
-#define stepPin 6
-#define dirPin 7
-#define stepsPerRevolution 6400
+/*
+ * Defines the total number of steps per revolution given the current stepper motor configuration
+ * Note: depends on how the stepper driver is wired, e.g., are half- or quarter-steps enabled?
+ */
+#define STEPS_PER_REVOLUTION 6400
+
+/*
+ * Set sensor polling intervals
+ */
+#define LUX_POLL_INTERVAL_MS 1000
+#define MOISTURE_POLL_INTERVAL_MS 1000
+
+#define DISPLAY_INTERVAL_MS 1000
+#define STEPPER_INTERVAL_MS 450000
+#define SERIAL_BAUD_RATE 9600
 
 // GLOBAL VARIABLES
 
 // Set application-wide verbosity
 const bool VERBOSE = true;
 
-int degPerMove = 15;                     // Degrees per rotation
-int revPerDay = 4;                       // Revolutions per day
-long stepperInterval = 450000;           // 7.5 minutes
-long displayInterval = 1000;             // 1 second
-long moisturePollInterval = 1000;        // 1 second
-long currentTick = stepperInterval/1000;
-long lightPollInterval = 1000;           // 1 second
-int lux;                                 // Light measurement
-int luxThreshold = 150;                  // Rotor disabled if under
+// Initialize current time interval (in seconds)
+long currentTick = STEPPER_INTERVAL_MS/1000;
 
-int currentMenuIndex = 1;
-
-int moisturePercent = 0;
-int moistureThreshold = 25;              // Percent moisture under which blue light flashes
-
-bool isRotationActive = false;
+int degPerMove = 15;                 // Degrees per rotation
+int revPerDay = 4;                   // Revolutions per day
+int lux;                             // Light measurement; dependents: display, lightSensor, RGB, stepperMotor
+int luxThreshold = 150;              // Rotor disabled if lux < luxThreshold; dependents: display, RGB, stepperMotor
+int currentMenuIndex = 1;            // Zero-indexed active menu on OLED display
+int moisturePercent = 0;             // Initial moisture reading; dependents: display, moistureSensor, RGB
+int moistureThreshold = 25;          // Percent moisture under which blue light flashes; dependents: RGB
+bool isRotationActive = false;       // Boolean flag that disables motor when false; dependents: display, rotaryEncoder, stepperMotor
 
 // For timed intervals
 auto timer = timer_create_default();
@@ -48,7 +53,7 @@ auto timer = timer_create_default();
 void setup() {  
   
   // Open serial port, set the baud rate to 9600 bps
-  Serial.begin(9600); 
+  Serial.begin(SERIAL_BAUD_RATE); 
 
   // Set up components
   setupRGB();            // RGB lighting
@@ -57,22 +62,19 @@ void setup() {
   setupDisplay();        // OLED display
 
   // Set up timers
-  timer.every(stepperInterval, moveStepperMotor);
-  timer.every(displayInterval, updateDisplay);
-  timer.every(moisturePollInterval, pollMoistureSensor);
-  timer.every(lightPollInterval, pollLightSensor);
+  timer.every(STEPPER_INTERVAL_MS, moveStepperMotor);
+  timer.every(DISPLAY_INTERVAL_MS, updateDisplay);
+  timer.every(MOISTURE_POLL_INTERVAL_MS, pollMoistureSensor);
+  timer.every(LUX_POLL_INTERVAL_MS, pollLightSensor);
 }
  
 void loop() {
-  // Disable stepper motor between rotations
-  digitalWrite(disablePin, !isRotationActive);
-
   // Handle updates
-  updateRGB();                   // Update RGB lighting
-  handleRotaryEncoderUpdates();  // Respond to manual rotor positioning
-  checkButtonPress();            // Respond to button press
-  runStepperMotor();             // Run rotor (if position not yet reached)
+  updateRGB();                 // Update RGB lighting
+  checkRotaryEncoderUpdate();  // Check for changes to manual rotor positioning
+  checkButtonPress();          // Check for button presses
+  runStepperMotor();           // Run rotor (if position not yet reached)
 
-  // Advance timer
+  // Increment global timer
   timer.tick();
 } 

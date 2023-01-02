@@ -12,8 +12,9 @@ void setupDisplay() {
   if (VERBOSE) {
     Serial.print("Setting up display...");
   }
-  
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C); //initialize with the I2C addr 0x3C (128x64)
+
+  // Initialize with the I2C addr 0x3C (128x64)
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
 
   if (VERBOSE) {
@@ -36,7 +37,7 @@ bool updateDisplay(void *) {
   // Reset countdown timer
   if (currentTick <= 0) {
     Serial.println("*** STEP ***");
-    currentTick = stepperInterval/1000;
+    currentTick = STEPPER_INTERVAL_MS/1000;
   }
 
   currentTick--;

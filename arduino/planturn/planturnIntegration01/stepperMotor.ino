@@ -1,7 +1,12 @@
+#define DIR_PIN 7
+#define DISABLE_PIN 5
+#define STEP_PIN 6
+
 #include <AccelStepper.h>
 
+
 // Define the stepper motor and the pins that is connected to
-AccelStepper stepper(1, stepPin, dirPin); // (Typeof driver: with 2 pins, STEP, DIR)
+AccelStepper stepper(1, STEP_PIN, DIR_PIN); // (Typeof driver: with 2 pins, STEP, DIR)
 
 void setupStepperMotor() {
   
@@ -9,8 +14,8 @@ void setupStepperMotor() {
     Serial.print("Setting up rotor...");
   }
   
-  pinMode(disablePin, OUTPUT);
-  digitalWrite(disablePin, HIGH);  // Disable stepper motor until needed
+  pinMode(DISABLE_PIN, OUTPUT);
+  digitalWrite(DISABLE_PIN, HIGH);  // Disable stepper motor until needed
   stepper.setMaxSpeed(5000);       // Set maximum speed value for the stepper
   stepper.setAcceleration(5000);   // Set acceleration value for the stepper
   stepper.setCurrentPosition(0);   // Set the current position to 0 steps
@@ -33,8 +38,11 @@ bool moveStepperMotor(void *) {
 
   // Only move if there is enough ambient light
   if (lux >= luxThreshold) {
-    stepper.move(map(degPerMove, 1, 360, 1, stepsPerRevolution));
+    stepper.move(map(degPerMove, 1, 360, 1, STEPS_PER_REVOLUTION));
   }
+
+  // Disable stepper motor between rotations
+  digitalWrite(DISABLE_PIN, !isRotationActive);
   
   return true;
 }

@@ -67,7 +67,8 @@ void checkButtonPress() {
 void cycleMenus() {
   currentMenuIndex++;
   if (currentMenuIndex > menuCount-1) {
-    currentMenuIndex = 0; // Reset to beginning
+    // Reset to beginning
+    currentMenuIndex = 0;
   }
 
   if (VERBOSE) {
@@ -76,8 +77,7 @@ void cycleMenus() {
   }
 }
 
-
-void handleRotaryEncoderUpdates() {
+void checkRotaryEncoderUpdate() {
   
   // Read the current state of inputCLK
   currentStateCLK = digitalRead(inputCLK);
@@ -103,7 +103,7 @@ void handleRotaryEncoderUpdates() {
   
   // Update previousStateCLK with the current state
   previousStateCLK = currentStateCLK; 
-  encoderPosition = map(rotaryEncoderCounter, 1, 30, 1, stepsPerRevolution);
+  encoderPosition = map(rotaryEncoderCounter, 1, 30, 1, STEPS_PER_REVOLUTION);
   moveStepperMotorTo(encoderPosition);
 
   if (VERBOSE) {

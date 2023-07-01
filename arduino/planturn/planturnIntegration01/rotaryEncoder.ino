@@ -94,11 +94,11 @@ void checkRotaryEncoderUpdate() {
      
   // Detect change in direction
   if (digitalRead(inputDT) != currentStateCLK) {
-    rotaryEncoderCounter--;
-    encdir ="CCW";
-  } else {
     rotaryEncoderCounter++;
-    encdir =" CW";
+    encdir ="CW";
+  } else {
+    rotaryEncoderCounter--;
+    encdir =" CCW";
   }
   
   // Update previousStateCLK with the current state

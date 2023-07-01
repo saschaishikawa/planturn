@@ -1,6 +1,6 @@
-#define DIR_PIN 7
 #define DISABLE_PIN 5
 #define STEP_PIN 6
+#define DIR_PIN 7
 
 #include <AccelStepper.h>
 

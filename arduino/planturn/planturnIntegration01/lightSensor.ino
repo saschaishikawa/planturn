@@ -8,7 +8,8 @@ bool pollLightSensor(void *) {
 
   float vout = float(lightReading) * VIN / float(1023);
   float rldr = (R * (VIN - vout)) / vout;
-  lux = 500 / (rldr/1000);
+  // lux = 500 / (rldr/1000);
+  lux = 200; // Hard-code for now
 
   if (VERBOSE) {
     Serial.println("LUX: " + String(lux));

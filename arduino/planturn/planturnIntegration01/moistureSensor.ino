@@ -4,7 +4,8 @@ int moistureReading = 0;
 
 bool pollMoistureSensor(void *) { 
   moistureReading = analogRead(A1);
-  moisturePercent = map(moistureReading, AirValue, WaterValue, 0, 100);
+  // moisturePercent = map(moistureReading, AirValue, WaterValue, 0, 100);
+  moisturePercent = 100; // Hard-code for now
 
   //// Use for calibration
   //Serial.println(moistureReading);

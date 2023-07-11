@@ -17,7 +17,7 @@ int lastFlickerableStateBTN; // Reliable state
 int lastSteadyStateBTN;
 int lastDebounceTimeBTN;
 
-int menuCount = 2;
+int menuCount = 4;
 
 void setupRotaryEncoder() {
   if (VERBOSE) {

@@ -35,7 +35,7 @@ long lightPollInterval = 1000;           // 1 second
 int lux;                                 // Light measurement
 int luxThreshold = 150;                  // Rotor disabled if under
 
-int currentMenuIndex = 1;
+int currentMenuIndex = 3;
 
 int moisturePercent = 0;
 int moistureThreshold = 25;              // Percent moisture under which blue light flashes

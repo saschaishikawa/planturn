@@ -59,14 +59,20 @@ bool updateDisplay(void *) {
 
 void displayActiveMenu() {
     switch (currentMenuIndex) {
-      case(0): // Menu 1
+      case(0): // Main menu
         displayMainMenu();
         break;
-      case(1): // Menu 2
+      case(1): // Rotation countdown
         displayRotationCountdown();
         break;
+      case(2): //H2O
+        displayH2OMenu();
+        break;
+      case(3): // LUX
+        displayLUXMenu();
+        break;
       default:
-        displayDefaultMenu();
+        displayMainMenu();
     }
 }
 
@@ -149,11 +155,39 @@ void displayRotationCountdown() {
   display.display(); 
 }
 
-void displayDefaultMenu() {
+void displayH2OMenu() {
   display.clearDisplay();
+
+  // Header
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.setCursor(16, 0);
-  display.println("???");
+  display.setCursor(56, 0);
+  display.println("H2O");
+
+  // H2O reading
+  display.setTextSize(3);
+  display.setTextColor(WHITE);
+  display.setCursor(24, 10);
+  display.println(String(moisturePercent) + "%");
+  
   display.display(); 
 }
+
+void displayLUXMenu() {
+  display.clearDisplay();
+
+  // Header
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(56, 0);
+  display.println("LUX");
+
+  // H2O reading
+  display.setTextSize(3);
+  display.setTextColor(WHITE);
+  display.setCursor(38, 10);
+  display.println(String(lux));
+  
+  display.display(); 
+}
+
